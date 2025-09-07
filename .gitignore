@@ -1,0 +1,83 @@
+##############################
+# .NET / ASP.NET Core
+##############################
+
+# Build results
+bin/
+obj/
+out/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+*.sln.iml
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+artifacts/
+
+# Azure
+*.azurePubxml
+*.publishsettings
+*.pubxml
+*.pubxml.user
+
+# Logs
+*.log
+
+# Test results / Coverage
+TestResults/
+*.coverage
+*.coveragexml
+
+# DotNet tools
+.dotnet/
+*.dbmdl
+
+# Others
+launchSettings.json
+
+##############################
+# Node.js / Angular
+##############################
+
+# Dependencies
+node_modules/
+jspm_packages/
+
+# Build outputs
+dist/
+tmp/
+temp/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDEs
+.vscode/
+*.swp
+*.swo
+
+##############################
+# OS Generated Files
+##############################
+.DS_Store
+Thumbs.db
+desktop.ini
