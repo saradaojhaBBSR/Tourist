@@ -1,1 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
+
+body {
+	background-color: aliceblue;
+}
+
+.nav-animate {
+	transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+}
+.nav-animate:hover, .nav-animate.active, .nav-animate.router-link-active {
+	background: #1976d2;
+	color: #fff !important;
+	box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+}
