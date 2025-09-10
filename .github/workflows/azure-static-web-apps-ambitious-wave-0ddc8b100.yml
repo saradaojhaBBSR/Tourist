@@ -30,9 +30,11 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
+        working-directory: ./Tourist.UI
         run: npm ci
 
       - name: Build Angular app
+        working-directory: ./Tourist.UI
         run: npm run build -- --configuration production --output-path=dist/tourist.ui/browser --base-href "/"
 
       - name: Deploy to Azure Static Web Apps
