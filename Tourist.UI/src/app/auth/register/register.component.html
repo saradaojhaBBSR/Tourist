@@ -5,62 +5,61 @@
 			<h2 class="fw-bold text-primary">Register</h2>
 			<p class="text-secondary mb-0">Create your account</p>
 		</div>
-		<form>
+		<form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)">
+			<div *ngIf="successMessage" class="alert alert-success mt-2 text-center">{{ successMessage }}</div>
+			<div *ngIf="errorMessage" class="alert alert-danger mt-2 text-center">{{ errorMessage }}</div>
 			<div class="row">
 				<div class="col-md-4 mb-3">
 					<label for="firstName" class="form-label">First Name</label>
-					<input type="text" class="form-control" id="firstName" placeholder="First Name" required>
+					<input type="text" class="form-control" id="firstName" placeholder="First Name" name="firstName" [(ngModel)]="model.firstName" required>
 				</div>
 				<div class="col-md-4 mb-3">
 					<label for="middleName" class="form-label">Middle Name</label>
-					<input type="text" class="form-control" id="middleName" placeholder="Middle Name">
+					<input type="text" class="form-control" id="middleName" placeholder="Middle Name" name="middleName" [(ngModel)]="model.middleName">
 				</div>
 				<div class="col-md-4 mb-3">
 					<label for="lastName" class="form-label">Last Name</label>
-					<input type="text" class="form-control" id="lastName" placeholder="Last Name" required>
+					<input type="text" class="form-control" id="lastName" placeholder="Last Name" name="lastName" [(ngModel)]="model.lastName" required>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-md-4 mb-3">
 					<label for="country" class="form-label">Country</label>
-					<input type="text" class="form-control" id="country" placeholder="Country" required>
+					<input type="text" class="form-control" id="country" placeholder="Country" name="country" [(ngModel)]="model.country" required>
 				</div>
 				<div class="col-md-4 mb-3">
 					<label for="state" class="form-label">State</label>
-					<input type="text" class="form-control" id="state" placeholder="State" required>
+					<input type="text" class="form-control" id="state" placeholder="State" name="state" [(ngModel)]="model.state" required>
 				</div>
 				<div class="col-md-4 mb-3">
 					<label for="city" class="form-label">City</label>
-					<input type="text" class="form-control" id="city" placeholder="City" required>
+					<input type="text" class="form-control" id="city" placeholder="City" name="city" [(ngModel)]="model.city" required>
 				</div>
 			</div>
 			<div class="mb-3">
 				<label for="email" class="form-label">Email ID</label>
-				<input type="email" class="form-control" id="email" placeholder="Enter email" required>
+				<input type="email" class="form-control" id="email" placeholder="Enter email" name="email" [(ngModel)]="model.email" required>
 			</div>
 			<div class="mb-3">
 				<label for="mobile" class="form-label">Mobile No</label>
-				<input type="tel" class="form-control" id="mobile" placeholder="Mobile Number" required>
+				<input type="tel" class="form-control" id="mobile" placeholder="Mobile Number" name="mobile" [(ngModel)]="model.PhoneNumber" required>
 			</div>
 			<div class="row">
 				<div class="col-md-6 mb-3">
 					<label for="password" class="form-label">Password</label>
-					<input type="password" class="form-control" id="password" placeholder="Password" required>
+					<input type="password" class="form-control" id="password" placeholder="Password" name="password" [(ngModel)]="model.password" required>
 				</div>
 				<div class="col-md-6 mb-3">
 					<label for="confirmPassword" class="form-label">Confirm Password</label>
-					<input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" required>
+					<input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" name="confirmPassword" [(ngModel)]="model.confirmPassword" required>
 				</div>
+			</div>			
+			<div *ngIf="model.password && model.confirmPassword && model.password !== model.confirmPassword" class="alert alert-danger text-center mb-2">
+				Password and Confirm Password do not match.
 			</div>
-			<!-- <div class="mb-3">
-				<label for="role" class="form-label">Role</label>
-				<select class="form-select" id="role" required>
-					<option value="">Select Role</option>
-					<option value="contributor">Contributor</option>
-					<option value="user">Reader</option>
-				</select>
-			</div> -->
-			<button type="submit" class="btn btn-primary w-100">Register</button>
+			<button type="submit" class="btn btn-primary w-100" [disabled]="registerForm.invalid || (model.password && model.confirmPassword && model.password !== model.confirmPassword)">Register</button>
+	<div *ngIf="successMessage" class="alert alert-success mt-3 text-center">{{ successMessage }}</div>
+	<div *ngIf="errorMessage" class="alert alert-danger mt-3 text-center">{{ errorMessage }}</div>
 	<button type="button" class="btn btn-secondary w-100 mt-2" routerLink="/">Cancel</button>
 		</form>
 		<div class="text-center mt-3">
