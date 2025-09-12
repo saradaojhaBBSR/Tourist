@@ -20,15 +20,15 @@ jobs:
 
     - name: Restore .NET dependencies
       run: dotnet restore
-      working-directory: ./Tourist/Tourist.API
+      working-directory: ./Tourist.API
 
     - name: Build
       run: dotnet build --configuration Release --no-restore
-      working-directory: ./Tourist/Tourist.API
+      working-directory: ./Tourist.API
 
     - name: Publish
       run: dotnet publish -c Release -o ./publish
-      working-directory: ./Tourist/Tourist.API
+      working-directory: ./Tourist.API
 
     - name: Login to Azure
       uses: azure/login@v2
@@ -41,4 +41,4 @@ jobs:
       uses: azure/webapps-deploy@v3
       with:
         app-name: "tourist-webapi"   # Your App Service name
-        package: ./Tourist/Tourist.API/publish
+        package: ./Tourist.API/publish
