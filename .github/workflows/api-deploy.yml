@@ -9,7 +9,12 @@ on:
     paths:
       - 'Tourist.API/**'
       - '.github/workflows/api-deploy.yml'
-
+  workflow_dispatch:
+   inputs:
+    environment:
+      description: 'Deployment environment'
+      required: true
+      default: 'production'
 jobs:
   build_and_deploy_api:
     runs-on: ubuntu-latest 
