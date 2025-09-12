@@ -32,6 +32,9 @@ jobs:
                const coredemo = require('@actions/core')
                return await coredemo.getIDToken()
            result-encoding: string
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./Tourist.UI
       - name: Install Angular CLI
         run: npm install -g @angular/cli
         working-directory: ./Tourist.UI
