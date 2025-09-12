@@ -4,7 +4,12 @@ on:
   push:
     branches:
       - main   # Deploy when code is pushed to main branch
-
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
