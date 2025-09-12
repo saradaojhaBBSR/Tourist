@@ -8,6 +8,9 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+     id-token: write   # Required for OIDC login
+     contents: read    # Required for actions/checkout
 
     steps:
     - name: Checkout code
