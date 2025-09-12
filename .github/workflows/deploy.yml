@@ -18,8 +18,9 @@ jobs:
       with:
         dotnet-version: '8.0.x'   # Match your API version
 
-    - name: Restore dependencies
+    - name: Restore .NET dependencies
       run: dotnet restore
+      working-directory: ./Tourist.API
 
     - name: Build
       run: dotnet build --configuration Release --no-restore
