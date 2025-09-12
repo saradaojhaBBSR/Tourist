@@ -29,7 +29,7 @@ namespace Tourist.API.Controllers
             if (identityResult.Succeeded)
             {
                 await _userManager.AddToRoleAsync(user, "Reader");
-                return Ok("User registered successfully");
+                return Ok(new { message = "User registered successfully" });
             }
             else
             {
