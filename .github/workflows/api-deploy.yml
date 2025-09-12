@@ -1,23 +1,23 @@
-name: Build and Deploy ASP.NET Core Web API to Azure
+name: API Deploy
 
 on:
   push:
-    branches:
-      - main   # Deploy when code is pushed to main branch
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Deployment environment'
-        required: true
-        default: 'production'
+    paths:
+      - 'Tourist.API/**'
+      - '.github/workflows/api-deploy.yml'
+  pull_request:
+    paths:
+      - 'Tourist.API/**'
+      - '.github/workflows/api-deploy.yml'
+
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+  build_and_deploy_api:
+    runs-on: ubuntu-latest 
     permissions:
      id-token: write   # Required for OIDC login
      contents: read    # Required for actions/checkout
 
-    steps:
+    steps:       
     - name: Checkout code
       uses: actions/checkout@v4
 

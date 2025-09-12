@@ -1,0 +1,52 @@
+# name: Build and Deploy ASP.NET Core Web API to Azure
+
+# on:
+#   push:
+#     branches:
+#       - main   # Deploy when code is pushed to main branch
+#   workflow_dispatch:
+#     inputs:
+#       environment:
+#         description: 'Deployment environment'
+#         required: true
+#         default: 'production'
+# jobs:
+#   build-and-deploy:
+#     runs-on: ubuntu-latest
+#     permissions:
+#      id-token: write   # Required for OIDC login
+#      contents: read    # Required for actions/checkout
+
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v4
+
+#     - name: Setup .NET
+#       uses: actions/setup-dotnet@v4
+#       with:
+#         dotnet-version: '8.0.x'   # Match your API version
+
+#     - name: Restore .NET dependencies
+#       run: dotnet restore
+#       working-directory: ./Tourist.API
+
+#     - name: Build
+#       run: dotnet build --configuration Release --no-restore
+#       working-directory: ./Tourist.API
+
+#     - name: Publish
+#       run: dotnet publish -c Release -o ./publish
+#       working-directory: ./Tourist.API
+
+#     - name: Login to Azure
+#       uses: azure/login@v2
+#       with:
+#         client-id: ${{ secrets.AZURE_CLIENT_ID }}
+#         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+#         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+#     - name: Deploy to Azure WebApp
+#       uses: azure/webapps-deploy@v3
+#       with:
+#         app-name: "tourist-webapi"   # Your App Service name
+#         package: ./Tourist.API/publish
