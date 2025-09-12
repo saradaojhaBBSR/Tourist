@@ -54,5 +54,10 @@ namespace Tourist.API.Controllers
             }
             return Unauthorized("Invalid Credentials");
         }
+        [HttpGet("health")]
+        public IActionResult Health()
+        {
+            return Ok("API is running");
+        }
     }
 }
