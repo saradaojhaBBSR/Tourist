@@ -20,7 +20,7 @@ jobs:
 
     - name: Restore .NET dependencies
       run: dotnet restore
-      working-directory: ./Tourist.API
+      working-directory: ../Tourist.API
 
     - name: Build
       run: dotnet build --configuration Release --no-restore
