@@ -2,12 +2,13 @@ name: Azure Static Web Apps CI/CD
 
 on:
   push:
-    branches:
-      - main
+    paths:
+      - 'Tourist.UI/**'
+      - '.github/workflows/azure-static-web-apps-ambitious-wave-0ddc8b100.yml'
   pull_request:
-    types: [opened, synchronize, reopened, closed]
-    branches:
-      - main
+    paths:
+      - 'Tourist.UI/**'
+      - '.github/workflows/azure-static-web-apps-ambitious-wave-0ddc8b100.yml'
 
 jobs:
   build_and_deploy_job:
