@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Tourist.API;
 using Tourist.API.Data;
-using Tourist.API.Middleware;
 using Tourist.API.Models;
 using Tourist.API.Repositories;
 
@@ -14,14 +13,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 //logger
-builder.Services.AddApplicationInsightsTelemetry(options =>
-{
-    options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"];
-    options.EnableAdaptiveSampling = false; //ensure all logs are captured
-});
 
+builder.Logging.AddApplicationInsights(
+    configureTelemetryConfiguration: (config) =>
+        config.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"],
+    configureApplicationInsightsLoggerOptions: (options) =>
+        options.TrackExceptionsAsExceptionTelemetry = true
+);
 
-builder.Logging.AddApplicationInsights();
 
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TouristConnectionString")));
