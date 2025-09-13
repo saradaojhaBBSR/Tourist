@@ -37,6 +37,7 @@ namespace Tourist.API.Controllers
             }
             else
             {
+                _logger.LogWarning("User registration failed for email: {Email}. Errors: {Errors}", request.Email, string.Join(", ", identityResult.Errors.Select(e => e.Description)));
                 return BadRequest(identityResult.Errors);
             }
 
