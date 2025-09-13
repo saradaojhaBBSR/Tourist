@@ -5,6 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Tourist.API;
 using Tourist.API.Data;
+using Tourist.API.Filters;
+using Tourist.API.Middleware;
 using Tourist.API.Models;
 using Tourist.API.Repositories;
 
@@ -21,7 +23,12 @@ builder.Services.AddApplicationInsightsTelemetry(options =>
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TouristConnectionString")));
 
-builder.Services.AddControllers();
+// Add global logging filter
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<GlobalLoggingFilter>();
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -81,7 +88,8 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
     dbContext.Database.Migrate(); // applies any pending migrations
 }
-
+//Exception Middleware
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseSwagger();
 app.UseSwaggerUI();

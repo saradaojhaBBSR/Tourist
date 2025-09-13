@@ -14,21 +14,25 @@ namespace Tourist.API.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
         private readonly ITokenRepository _tokenRepository;
-        public AuthController(UserManager<ApplicationUser> userManager, IMapper mapper, ITokenRepository tokenRepository)
+        private readonly ILogger<AuthController> _logger;
+        public AuthController(UserManager<ApplicationUser> userManager, IMapper mapper, ITokenRepository tokenRepository, ILogger<AuthController> logger)
         {
             _userManager = userManager;
             _mapper = mapper;
             _tokenRepository = tokenRepository;
+            _logger = logger;
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
         {
+            _logger.LogInformation("Register endpoint called for email: {Email}", request.Email);
             var user = _mapper.Map<ApplicationUser>(request);
 
             var identityResult = await _userManager.CreateAsync(user, request.Password);
             if (identityResult.Succeeded)
             {
                 await _userManager.AddToRoleAsync(user, "Reader");
+                _logger.LogInformation("User registered successfully: {Email}", request.Email);
                 return Ok(new { message = "User registered successfully" });
             }
             else
