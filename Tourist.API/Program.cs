@@ -88,8 +88,8 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
     dbContext.Database.Migrate(); // applies any pending migrations
 }
-//Exception Middleware
-app.UseMiddleware<ErrorHandlingMiddleware>();
+
+
 
 app.UseSwagger();
 app.UseSwaggerUI();
