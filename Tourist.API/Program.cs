@@ -20,6 +20,12 @@ builder.Services.AddApplicationInsightsTelemetry(options =>
     options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"];
 });
 
+
+builder.Logging.AddApplicationInsights(
+    configureTelemetryConfiguration: (config) => { },
+    configureApplicationInsightsLoggerOptions: (options) => { }
+);
+
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TouristConnectionString")));
 
