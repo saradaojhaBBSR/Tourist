@@ -1,11 +1,10 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Tourist.API;
 using Tourist.API.Data;
-using Tourist.API.Filters;
 using Tourist.API.Middleware;
 using Tourist.API.Models;
 using Tourist.API.Repositories;
@@ -18,6 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplicationInsightsTelemetry(options =>
 {
     options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"];
+    options.EnableAdaptiveSampling = false; //ensure all logs are captured
 });
 
 
@@ -30,10 +30,7 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TouristConnectionString")));
 
 // Add global logging filter
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add<GlobalLoggingFilter>();
-});
+builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
