@@ -6,56 +6,43 @@
                     <div class="card-body p-md-5">
                         <h3 class="mb-4 pb-2 pb-md-0 mb-md-5 px-md-2 text-center">Registration Info</h3>
                         <form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)" class="px-md-2">
-                            <div *ngIf="successMessage || errorMessage || (model.password && model.confirmPassword && model.password !== model.confirmPassword)"
-                                class="mb-3">
-                                <div *ngIf="successMessage" class="alert alert-success text-center mb-2">{{
-                                    successMessage }}</div>
-                                <div *ngIf="errorMessage" class="alert alert-danger text-center mb-2">{{ errorMessage }}
-                                </div>
-                                <div *ngIf="model.password && model.confirmPassword && model.password !== model.confirmPassword"
-                                    class="alert alert-danger text-center mb-2">
+                            <div *ngIf="successMessage || errorMessage || (model.password && model.confirmPassword && model.password !== model.confirmPassword)" class="mb-3">
+                                <div *ngIf="successMessage" class="alert alert-success text-center mb-2">{{ successMessage }}</div>
+                                <div *ngIf="errorMessage" class="alert alert-danger text-center mb-2">{{ errorMessage }}</div>
+                                <div *ngIf="model.password && model.confirmPassword && model.password !== model.confirmPassword" class="alert alert-danger text-center mb-2">
                                     Password and Confirm Password do not match.
                                 </div>
                             </div>
                             <div class="form-outline mb-4">
                                 <label class="form-label" for="firstName">First Name</label>
-                                <input type="text" id="firstName" class="form-control" placeholder="First Name"
-                                    name="firstName" [(ngModel)]="model.firstName" required />
+                                <input type="text" id="firstName" class="form-control" placeholder="First Name" name="firstName" [(ngModel)]="model.firstName" required />
                             </div>
                             <div class="form-outline mb-4">
                                 <label class="form-label" for="middleName">Middle Name</label>
-                                <input type="text" id="middleName" class="form-control" placeholder="Middle Name"
-                                    name="middleName" [(ngModel)]="model.middleName" />
+                                <input type="text" id="middleName" class="form-control" placeholder="Middle Name" name="middleName" [(ngModel)]="model.middleName" />
                             </div>
                             <div class="form-outline mb-4">
                                 <label class="form-label" for="lastName">Last Name</label>
-                                <input type="text" id="lastName" class="form-control" placeholder="Last Name"
-                                    name="lastName" [(ngModel)]="model.lastName" required />
+                                <input type="text" id="lastName" class="form-control" placeholder="Last Name" name="lastName" [(ngModel)]="model.lastName" required />
                             </div>
                             <div class="row">
                                 <div class="col-md-4 mb-4">
                                     <label for="country" class="form-label">Country</label>
-                                    <select class="form-select" id="country" name="country" [(ngModel)]="model.country"
-                                        (change)="onCountryChange(getSelectValue($event))" required>
+                                    <select class="form-select" id="country" name="country" [(ngModel)]="model.country" (change)="onCountryChange(getSelectValue($event))" required>
                                         <option value="">Select Country</option>
-                                        <option *ngFor="let country of countries" [value]="country.isoCode">{{
-                                            country.name }}</option>
+                                        <option *ngFor="let country of countries" [value]="country.isoCode">{{ country.name }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4 mb-4">
                                     <label for="state" class="form-label">State</label>
-                                    <select class="form-select" id="state" name="state" [(ngModel)]="model.state"
-                                        (change)="onStateChange(getSelectValue($event))" [disabled]="!states.length"
-                                        required>
+                                    <select class="form-select" id="state" name="state" [(ngModel)]="model.state" (change)="onStateChange(getSelectValue($event))" [disabled]="!states.length" required>
                                         <option value="">Select State</option>
-                                        <option *ngFor="let state of states" [value]="state.isoCode">{{ state.name }}
-                                        </option>
+                                        <option *ngFor="let state of states" [value]="state.isoCode">{{ state.name }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4 mb-4">
                                     <label for="city" class="form-label">City</label>
-                                    <select class="form-select" id="city" name="city" [(ngModel)]="model.city"
-                                        [disabled]="!cities.length" required>
+                                    <select class="form-select" id="city" name="city" [(ngModel)]="model.city" [disabled]="!cities.length" required>
                                         <option value="">Select City</option>
                                         <option *ngFor="let city of cities" [value]="city.name">{{ city.name }}</option>
                                     </select>
@@ -63,39 +50,32 @@
                             </div>
                             <div class="form-outline mb-4">
                                 <label class="form-label" for="email">Email ID</label>
-                                <input type="email" id="email" class="form-control" placeholder="Enter email"
-                                    name="email" [(ngModel)]="model.email" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" #emailRef="ngModel" />
+                                <input type="email" id="email" class="form-control" placeholder="Enter email" name="email" [(ngModel)]="model.email" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" #emailRef="ngModel" />
                                 <div *ngIf="emailRef.invalid && (emailRef.dirty || emailRef.touched)" class="text-danger small mt-1">
                                     Please enter a valid email address.
                                 </div>
                             </div>
                             <div class="form-outline mb-4">
                                 <label class="form-label" for="mobile">Mobile No</label>
-                                <input type="tel" id="mobile" class="form-control" placeholder="Mobile Number"
-                                    name="mobile" [(ngModel)]="model.PhoneNumber" required />
+                                <input type="tel" id="mobile" class="form-control" placeholder="Mobile Number" name="mobile" [(ngModel)]="model.PhoneNumber" required />
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-4">
                                     <div class="form-outline">
                                         <label class="form-label" for="password">Password</label>
-                                        <input type="password" id="password" class="form-control" placeholder="Password"
-                                            name="password" [(ngModel)]="model.password" required />
+                                        <input type="password" id="password" class="form-control" placeholder="Password" name="password" [(ngModel)]="model.password" required />
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-4">
                                     <div class="form-outline">
                                         <label class="form-label" for="confirmPassword">Confirm Password</label>
-                                        <input type="password" id="confirmPassword" class="form-control"
-                                            placeholder="Confirm Password" name="confirmPassword"
-                                            [(ngModel)]="model.confirmPassword" required />
+                                        <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm Password" name="confirmPassword" [(ngModel)]="model.confirmPassword" required />
                                     </div>
                                 </div>
                             </div>
                             <div class="d-flex justify-content-start gap-2">
-                                <button type="submit" class="btn btn-success btn-lg mb-1"
-                                    [disabled]="registerForm.invalid || (model.password && model.confirmPassword && model.password !== model.confirmPassword)">Register</button>
-                                <button type="button" class="btn btn-secondary btn-lg mb-1"
-                                    routerLink="/">Cancel</button>
+                                <button type="submit" class="btn btn-success btn-lg mb-1" [disabled]="registerForm.invalid || (model.password && model.confirmPassword && model.password !== model.confirmPassword)">Register</button>
+                                <button type="button" class="btn btn-secondary btn-lg mb-1" routerLink="/">Cancel</button>
                             </div>
                         </form>
                         <div class="text-center mt-4">

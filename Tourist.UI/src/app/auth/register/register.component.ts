@@ -1,10 +1,8 @@
 
-
-  import { Component } from '@angular/core';
-
+import { Component } from '@angular/core';
 import { RegisterService } from './services/register.service';
 import { RegisterModel } from './Models/register.model';
-import { Country, State, City } from 'country-state-city';
+
 
 @Component({
   selector: 'app-register',
@@ -34,29 +32,42 @@ export class RegisterComponent {
 
   constructor(private registerService: RegisterService) {}
 
-  countries = Country.getAllCountries();
+  countries: any[] = [];
   states: any[] = [];
   cities: any[] = [];
-  onCountryChange(countryCode: string) {
+
+  async onCountryChange(countryCode: string) {
     this.model.country = countryCode;
+    const { State } = await import('country-state-city');
     this.states = State.getStatesOfCountry(countryCode);
     this.model.state = '';
     this.cities = [];
     this.model.city = '';
   }
 
-  onStateChange(stateCode: string) {
+
+  async onStateChange(stateCode: string) {
     this.model.state = stateCode;
+    const { City } = await import('country-state-city');
     this.cities = City.getCitiesOfState(this.model.country, stateCode);
     this.model.city = '';
   }
 
-  onSubmit(form: any) {
+  async ngOnInit() {
+    const { Country } = await import('country-state-city');
+    // Only load India
+    this.countries = [Country.getCountryByCode('IN')].filter(Boolean);
+    // Optionally, set default country to India
+    this.model.country = 'IN';
+    await this.onCountryChange('IN');
+  }
+
+  async onSubmit(form: any) {
     this.submitted = true;
     this.successMessage = '';
     this.errorMessage = '';
     if (form.valid) {
-      // Prepare a copy of the model with names instead of codes
+      const { Country, State, City } = await import('country-state-city');
       const countryObj = this.countries.find(c => c.isoCode === this.model.country);
       const stateObj = this.states.find(s => s.isoCode === this.model.state);
       const cityObj = this.cities.find(c => c.name === this.model.city);
