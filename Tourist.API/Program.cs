@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Tourist.API;
 using Tourist.API.Data;
+using Tourist.API.Middleware;
 using Tourist.API.Models;
 using Tourist.API.Repositories;
 
@@ -88,7 +89,8 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate(); // applies any pending migrations
 }
 
-
+//exception middleware
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseSwagger();
 app.UseSwaggerUI();
