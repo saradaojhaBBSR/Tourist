@@ -1,14 +1,16 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Tourist.API.Models;
 using Tourist.API.Models.Dto;
 using Tourist.API.Repositories;
 
-namespace Tourist.API.Controllers
+namespace Tourist.API.Controllers.v1
 {
     [Route("api/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
     public class AuthController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -62,7 +64,6 @@ namespace Tourist.API.Controllers
         [HttpGet("health")]
         public IActionResult Health()
         {
-            throw(new Exception("Test exception for logging"));
             _logger.LogInformation("Health check endpoint called.");
             return Ok("API is running");
         }
