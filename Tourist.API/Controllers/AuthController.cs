@@ -62,6 +62,7 @@ namespace Tourist.API.Controllers
         [HttpGet("health")]
         public IActionResult Health()
         {
+            throw(new Exception("Test exception for logging"));
             _logger.LogInformation("Health check endpoint called.");
             return Ok("API is running");
         }

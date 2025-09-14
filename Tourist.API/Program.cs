@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Tourist.API;
 using Tourist.API.Data;
-using Tourist.API.Middleware;
 using Tourist.API.Models;
 using Tourist.API.Repositories;
 
@@ -14,14 +14,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 //logger
-
-builder.Logging.AddApplicationInsights(
-    configureTelemetryConfiguration: (config) =>
-        config.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"],
-    configureApplicationInsightsLoggerOptions: (options) =>
-        options.TrackExceptionsAsExceptionTelemetry = true
-);
-
+if (builder.Environment.IsProduction()) 
+{
+    builder.Logging.AddApplicationInsights(
+        configureTelemetryConfiguration: (config) =>
+            config.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"],
+        configureApplicationInsightsLoggerOptions: (options) =>
+            options.TrackExceptionsAsExceptionTelemetry = true
+    );
+}
 
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TouristConnectionString")));
@@ -82,19 +83,38 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
+// Use built-in exception handler
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+else
+{
+    app.UseExceptionHandler("/error");
+}
+
+
+// Error endpoint for production
+app.Map("/error", (HttpContext httpContext) =>
+{
+    var feature = httpContext.Features.Get<IExceptionHandlerFeature>();
+    var exception = feature?.Error;
+    var logger = httpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+    if (exception != null)
+    {
+        logger.LogError(exception, "Unhandled exception caught by built-in middleware");
+    }
+    return Results.Problem("An unexpected error occurred.");
+});
+
 // Apply migrations automatically at startup
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
     dbContext.Database.Migrate(); // applies any pending migrations
 }
-
-//exception middleware
-app.UseMiddleware<ErrorHandlingMiddleware>();
-
-app.UseSwagger();
-app.UseSwaggerUI();
-
 
 app.UseHttpsRedirection();
 
