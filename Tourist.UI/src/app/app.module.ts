@@ -13,6 +13,8 @@ import { apiHttpInterceptorFn } from './core/interceptors/api-http-interceptor';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AuthGuard } from './core/auth.guard';
 import { CookieService } from 'ngx-cookie-service';
+import { ErrorHandler } from '@angular/core';
+import { GlobalErrorHandler } from './core/global-error-handler';
 
 @NgModule({
   declarations: [
@@ -34,7 +36,8 @@ import { CookieService } from 'ngx-cookie-service';
       jwtRefreshInterceptorFn
     ])),
     AuthGuard,
-    CookieService
+    CookieService,
+    { provide: ErrorHandler, useClass: GlobalErrorHandler }
   ],
   bootstrap: [AppComponent]
 })
