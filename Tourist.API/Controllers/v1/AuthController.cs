@@ -55,11 +55,45 @@ namespace Tourist.API.Controllers.v1
                 {
                     var roles = await _userManager.GetRolesAsync(identityUser);
                     var jwtToken = await _tokenRepository.CreateJwtToken(identityUser, roles.ToList());
-                    var response = new LoginResponseDto { Email = request.Email, Roles = roles.ToList(), Token = jwtToken };
+                    var refreshToken = await _tokenRepository.GenerateRefreshToken();
+                    await _tokenRepository.SaveRefreshToken(identityUser, refreshToken);
+
+                    var response = new LoginResponseDto
+                    {
+                        Email = request.Email,
+                        Roles = roles.ToList(),
+                        Token = jwtToken,
+                        RefreshToken = refreshToken
+                    };
                     return Ok(response);
                 }
             }
             return Unauthorized("Invalid Credentials");
+        }
+        [HttpPost("refreshtoken")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto request)
+        {
+            var identityUser = await _userManager.FindByEmailAsync(request.Email);
+            if (identityUser is null)
+                return Unauthorized("Invalid user");
+
+            var isValid = await _tokenRepository.ValidateRefreshToken(identityUser, request.RefreshToken);
+            if (!isValid)
+                return Unauthorized("Invalid refresh token");
+
+            var roles = await _userManager.GetRolesAsync(identityUser);
+            var newJwtToken = await _tokenRepository.CreateJwtToken(identityUser, roles.ToList());
+            var newRefreshToken = await _tokenRepository.GenerateRefreshToken();
+            await _tokenRepository.SaveRefreshToken(identityUser, newRefreshToken);
+
+            var response = new LoginResponseDto
+            {
+                Email = request.Email,
+                Roles = roles.ToList(),
+                Token = newJwtToken,
+                RefreshToken = newRefreshToken
+            };
+            return Ok(response);
         }
         [HttpGet("health")]
         public IActionResult Health()
