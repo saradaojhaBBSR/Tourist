@@ -27,6 +27,7 @@ export class RegisterComponent {
     confirmPassword: ''   
   };
   submitted = false;
+  loading = false;
   successMessage = '';
   errorMessage = '';
 
@@ -66,6 +67,7 @@ export class RegisterComponent {
     this.submitted = true;
     this.successMessage = '';
     this.errorMessage = '';
+    this.loading = true;
     if (form.valid) {
       const { Country, State, City } = await import('country-state-city');
       const countryObj = this.countries.find(c => c.isoCode === this.model.country);
@@ -88,11 +90,15 @@ export class RegisterComponent {
           this.states = [];
           this.cities = [];
           this.submitted = false;
+          this.loading = false;
         },
         error: (err) => {
           this.errorMessage = 'Registration failed. Please try again.';
+          this.loading = false;
         }
       });
+    } else {
+      this.loading = false;
     }
   }
 }
