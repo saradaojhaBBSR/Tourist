@@ -9,17 +9,17 @@ import { RegisterComponent } from './auth/register/register.component';
 import { LoginComponent } from './auth/login/login.component';
 import { FormsModule } from '@angular/forms';
 import { apiHttpInterceptorFn } from './core/interceptors/api-http-interceptor';
-
-
-
-
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { AuthGuard } from './auth/auth.guard';
+import { CookieService } from 'ngx-cookie-service';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     RegisterComponent,
-    LoginComponent
+    LoginComponent,   
+    DashboardComponent
   ],
   imports: [
     BrowserModule,
@@ -28,7 +28,9 @@ import { apiHttpInterceptorFn } from './core/interceptors/api-http-interceptor';
     FormsModule
   ],
   providers: [
-    provideHttpClient(withInterceptors([apiHttpInterceptorFn]))
+    provideHttpClient(withInterceptors([apiHttpInterceptorFn])),
+    AuthGuard,
+    CookieService
   ],
   bootstrap: [AppComponent]
 })
