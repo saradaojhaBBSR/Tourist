@@ -2,7 +2,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Tourist.API.Models;
 using Tourist.API.Models.Dto;
@@ -17,15 +16,18 @@ namespace Tourist.API.Controllers.v1
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
-        public AdminController(UserManager<ApplicationUser> userManager,IMapper mapper)
+        private readonly ILogger<AdminController> _logger;
+        public AdminController(UserManager<ApplicationUser> userManager, IMapper mapper, ILogger<AdminController> logger)
         {
             _userManager = userManager;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet("users")]
         public async Task<IActionResult> GetAllUsers()
         {
+            _logger.LogInformation("Fetching all users");
             var users = _userManager.Users.ToList();    
             var result = new List<UsersInfoDto>();
 
@@ -37,6 +39,7 @@ namespace Tourist.API.Controllers.v1
                 result.Add(dto);
             }
 
+            _logger.LogInformation("Fetched {Count} users", result.Count);
             return Ok(result);
         }   
 
@@ -45,7 +48,11 @@ namespace Tourist.API.Controllers.v1
         {
             if (updateDto == null) return BadRequest();
             var user = await _userManager.FindByIdAsync(id);
-            if (user == null) return NotFound();
+            if (user == null)
+            {
+                _logger.LogWarning("Patch failed: User with id {UserId} not found", id);
+                return NotFound();
+            }
 
             // Update user fields if provided
             if (updateDto.FirstName != null) user.FirstName = updateDto.FirstName;
@@ -62,7 +69,11 @@ namespace Tourist.API.Controllers.v1
             if (updateDto.City != null) user.City = updateDto.City;
 
             var result = await _userManager.UpdateAsync(user);
-            if (!result.Succeeded) return BadRequest(result.Errors);
+            if (!result.Succeeded)
+            {
+                _logger.LogWarning("Patch failed: Could not update user {UserId}. Errors: {Errors}", id, string.Join(", ", result.Errors.Select(e => e.Description)));
+                return BadRequest(result.Errors);
+            }
 
             // Handle role update if provided
             if (!string.IsNullOrEmpty(updateDto.Role))
@@ -71,6 +82,11 @@ namespace Tourist.API.Controllers.v1
                 if (currentRoles.Any())
                     await _userManager.RemoveFromRolesAsync(user, currentRoles);
                 await _userManager.AddToRoleAsync(user, updateDto.Role);
+                _logger.LogInformation("User {UserId} role updated to {Role}", id, updateDto.Role);
+            }
+            else
+            {
+                _logger.LogInformation("User {UserId} updated", id);
             }
 
             var dto = _mapper.Map<UsersInfoDto>(user);
@@ -83,9 +99,18 @@ namespace Tourist.API.Controllers.v1
         public async Task<IActionResult> DeleteUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
-            if (user == null) return NotFound();
+            if (user == null)
+            {
+                _logger.LogWarning("Delete failed: User with id {UserId} not found", id);
+                return NotFound();
+            }
             var result = await _userManager.DeleteAsync(user);
-            if (!result.Succeeded) return BadRequest(result.Errors);
+            if (!result.Succeeded)
+            {
+                _logger.LogWarning("Delete failed: Could not delete user {UserId}. Errors: {Errors}", id, string.Join(", ", result.Errors.Select(e => e.Description)));
+                return BadRequest(result.Errors);
+            }
+            _logger.LogInformation("User {UserId} deleted", id);
             return NoContent();
         }
     }
