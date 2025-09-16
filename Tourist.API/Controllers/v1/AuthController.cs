@@ -20,7 +20,7 @@ namespace Tourist.API.Controllers.v1
         public AuthController(UserManager<ApplicationUser> userManager, IMapper mapper, ITokenRepository tokenRepository, ILogger<AuthController> logger)
         {
             _userManager = userManager;
-            _mapper = mapper;
+            _mapper = mapper;       
             _tokenRepository = tokenRepository;
             _logger = logger;
         }
@@ -61,7 +61,7 @@ namespace Tourist.API.Controllers.v1
                     var response = new LoginResponseDto
                     {
                         Email = request.Email,
-                        Roles = roles.ToList(),
+                        Role = roles.FirstOrDefault(),
                         Token = jwtToken,
                         RefreshToken = refreshToken
                     };
@@ -89,7 +89,7 @@ namespace Tourist.API.Controllers.v1
             var response = new LoginResponseDto
             {
                 Email = request.Email,
-                Roles = roles.ToList(),
+                Role = roles.FirstOrDefault(),
                 Token = newJwtToken,
                 RefreshToken = newRefreshToken
             };
