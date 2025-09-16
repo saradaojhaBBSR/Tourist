@@ -20,6 +20,7 @@ namespace Tourist.API
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName));
 
             CreateMap<ApplicationUser, UsersInfoDto>();
+            CreateMap<UserUpdateDto, ApplicationUser>();
         }
     }
 }   
