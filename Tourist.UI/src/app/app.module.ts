@@ -15,6 +15,7 @@ import { AuthGuard } from './core/auth.guard';
 import { CookieService } from 'ngx-cookie-service';
 import { ErrorHandler } from '@angular/core';
 import { GlobalErrorHandler } from './core/global-error-handler';
+import { AdminComponent } from './admin/admin.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,7 @@ import { GlobalErrorHandler } from './core/global-error-handler';
     HomeComponent,
     RegisterComponent,
     LoginComponent,   
-    DashboardComponent
+    DashboardComponent, AdminComponent
   ],
   imports: [
     BrowserModule,

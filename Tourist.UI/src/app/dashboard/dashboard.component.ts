@@ -10,15 +10,22 @@ import { CookieService } from 'ngx-cookie-service';
 })
 export class DashboardComponent {
   userEmail: string | null = null;
+  userRole: string | null = null;
 
   constructor(private router: Router, private cookieService: CookieService) {}
 
   ngOnInit() {
     this.userEmail = localStorage.getItem('userEmail');
+    this.userRole = localStorage.getItem('user-role');
+  }
+
+  isAdmin(): boolean {
+    return this.userRole === 'Admin';
   }
 
   logout() {
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('user-role');
     this.cookieService.delete('Authorization', '/');
     this.router.navigate(['/login']);
   }

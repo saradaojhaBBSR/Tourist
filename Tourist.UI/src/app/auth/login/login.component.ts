@@ -27,10 +27,15 @@ export class LoginComponent {
     this.loading = true;
     this.loginService.login(this.model).subscribe({
       next: (res) => {
-        // Store email in localStorage for dashboard display
-        //jwt set
+        // Store email and role in localStorage for dashboard display
         this.cookieService.set('Authorization', `Bearer ${res.token}`, undefined, '/', undefined, true, 'Strict');
         localStorage.setItem('userEmail', this.model.email);
+        if (res.role) {
+          console.log('User role:', res.role);
+          localStorage.setItem('user-role', res.role);
+        } else {
+          localStorage.removeItem('user-role');
+        }
         this.loading = false;
         this.router.navigate(['/dashboard']);
       },
