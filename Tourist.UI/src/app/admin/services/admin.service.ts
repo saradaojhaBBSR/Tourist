@@ -14,7 +14,7 @@ export class AdminService {
   }
 
   patchUser(id: string, data: any): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/users/${id}`, data);
+    return this.http.put(`${this.apiUrl}/users/${id}`, data);
   }
 
   deleteUser(id: string): Observable<any> {
