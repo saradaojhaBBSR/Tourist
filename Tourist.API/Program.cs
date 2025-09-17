@@ -25,11 +25,11 @@ if (builder.Environment.IsProduction())
     }
 
     builder.Logging.AddApplicationInsights(
-       configureTelemetryConfiguration: (config) =>
-           config.ConnectionString = builder.Configuration.GetConnectionString("TouristAppInsightsConnectingString"),
-       configureApplicationInsightsLoggerOptions: (options) =>
-           options.TrackExceptionsAsExceptionTelemetry = true
-   );
+    configureTelemetryConfiguration: (config) =>
+        config.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"],
+    configureApplicationInsightsLoggerOptions: (options) =>
+        options.TrackExceptionsAsExceptionTelemetry = true
+ );
 }
 
 builder.Services.AddDbContext<AuthDbContext>(options =>
@@ -152,10 +152,10 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate(); // applies any pending migrations
 }
 
+app.UseHttpsRedirection();
+
 //cors
 app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
-
-app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
