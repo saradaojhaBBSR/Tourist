@@ -124,15 +124,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
-    app.UseSwaggerUI();
-    //cors
-    app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+    app.UseSwaggerUI();    
 }
 else
 {
     app.UseExceptionHandler("/error");
 }
-
 
 // Error endpoint for production
 app.Map("/error", (HttpContext httpContext) =>
@@ -154,6 +151,9 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
     dbContext.Database.Migrate(); // applies any pending migrations
 }
+
+//cors
+app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 app.UseHttpsRedirection();
 
