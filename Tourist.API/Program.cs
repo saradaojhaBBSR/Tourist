@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.Conventions;
+using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
@@ -15,6 +16,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+
+
 //logger
 if (builder.Environment.IsProduction())
 {
@@ -24,6 +27,13 @@ if (builder.Environment.IsProduction())
         configureApplicationInsightsLoggerOptions: (options) =>
             options.TrackExceptionsAsExceptionTelemetry = true
     );
+
+    //key-vault
+    var keyVaultUrl = builder.Configuration["KeyVault:VaultUri"];
+    if (!string.IsNullOrEmpty(keyVaultUrl))
+    {
+        builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUrl), new DefaultAzureCredential());
+    }
 }
 
 builder.Services.AddDbContext<AuthDbContext>(options =>
