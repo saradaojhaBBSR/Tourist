@@ -35,9 +35,19 @@ if (builder.Environment.IsProduction())
         builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUrl), new DefaultAzureCredential());
     }
 }
+var touristConnectionString = builder.Configuration.GetConnectionString("TouristConnectionString");
+
 
 builder.Services.AddDbContext<AuthDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("TouristConnectionString")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("TouristConnectionString"),
+        sqlOptions => sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(10),
+            errorNumbersToAdd: null
+        )
+    ));
+
 
 // Add global logging filter
 builder.Services.AddControllers();
@@ -141,7 +151,8 @@ app.Map("/error", (HttpContext httpContext) =>
     var logger = httpContext.RequestServices.GetRequiredService<ILogger<Program>>();
     if (exception != null)
     {
-        logger.LogError(exception, "Unhandled exception caught by built-in middleware");
+        logger.LogError(exception, "Unhandled exception caught by built-in middleware: {ExceptionType} - {Message}\nStackTrace: {StackTrace}", 
+            exception.GetType().FullName, exception.Message, exception.StackTrace);
     }
     return Results.Problem("An unexpected error occurred.");
 });
