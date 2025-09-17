@@ -47,6 +47,8 @@ namespace Tourist.API.Controllers.v1
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
+            _logger.LogInformation("Login endpoint called for email: {Email}", request.Email);
+
             var identityUser = await _userManager.FindByEmailAsync(request.Email);
             if (identityUser is not null)
             {
@@ -65,21 +67,40 @@ namespace Tourist.API.Controllers.v1
                         Token = jwtToken,
                         RefreshToken = refreshToken
                     };
+
+                    _logger.LogInformation("User logged in successfully: {Email}, Role: {Role}", request.Email, response.Role);
+
                     return Ok(response);
                 }
+                else
+                {
+                    _logger.LogWarning("Invalid password for email: {Email}", request.Email);
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Login attempt with unknown email: {Email}", request.Email);
             }
             return Unauthorized("Invalid Credentials");
         }
         [HttpPost("refreshtoken")]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto request)
         {
+            _logger.LogInformation("Refresh token endpoint called for email: {Email}", request.Email);
+
             var identityUser = await _userManager.FindByEmailAsync(request.Email);
             if (identityUser is null)
+            {
+                _logger.LogWarning("Refresh token attempt for invalid user: {Email}", request.Email);
                 return Unauthorized("Invalid user");
+            }
 
             var isValid = await _tokenRepository.ValidateRefreshToken(identityUser, request.RefreshToken);
             if (!isValid)
+            {
+                _logger.LogWarning("Invalid refresh token for email: {Email}", request.Email);
                 return Unauthorized("Invalid refresh token");
+            }
 
             var roles = await _userManager.GetRolesAsync(identityUser);
             var newJwtToken = await _tokenRepository.CreateJwtToken(identityUser, roles.ToList());
@@ -93,6 +114,9 @@ namespace Tourist.API.Controllers.v1
                 Token = newJwtToken,
                 RefreshToken = newRefreshToken
             };
+
+            _logger.LogInformation("Refresh token issued for email: {Email}, Role: {Role}", request.Email, response.Role);
+
             return Ok(response);
         }
         [HttpGet("health")]
