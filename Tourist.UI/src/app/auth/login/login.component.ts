@@ -28,7 +28,9 @@ export class LoginComponent {
     this.loginService.login(this.model).subscribe({
       next: (res) => {
         // Store email and role in localStorage for dashboard display
-        this.cookieService.set('Authorization', `Bearer ${res.token}`, undefined, '/', undefined, true, 'Strict');
+        this.cookieService.set('Authorization', `Bearer ${res.token}`, undefined, '/', undefined, true, 'Strict');        
+        this.cookieService.set('RefreshToken', res.refreshToken, undefined, '/', undefined, false, 'Lax');
+        
         localStorage.setItem('userEmail', this.model.email);
         if (res.role) {
           console.log('User role:', res.role);

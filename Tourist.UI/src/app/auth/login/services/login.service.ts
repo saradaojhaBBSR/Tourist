@@ -16,7 +16,7 @@ export class LoginService {
     return this.http.post(`${this.apiUrl}/login`, data);
   }
 
-  refreshToken(refreshToken: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/refreshtoken`, { refreshToken });
+  refreshToken(refreshToken: string, email: string | null): Observable<any> {
+    return this.http.post(`${this.apiUrl}/refreshtoken`, { refreshToken, email });
   }
 }
