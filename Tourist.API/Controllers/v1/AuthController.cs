@@ -20,7 +20,7 @@ namespace Tourist.API.Controllers.v1
         public AuthController(UserManager<ApplicationUser> userManager, IMapper mapper, ITokenRepository tokenRepository, ILogger<AuthController> logger)
         {
             _userManager = userManager;
-            _mapper = mapper;       
+            _mapper = mapper;
             _tokenRepository = tokenRepository;
             _logger = logger;
         }
@@ -47,8 +47,6 @@ namespace Tourist.API.Controllers.v1
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
-            _logger.LogInformation("Login endpoint called for email: {Email}", request.Email);
-
             var identityUser = await _userManager.FindByEmailAsync(request.Email);
             if (identityUser is not null)
             {
@@ -58,7 +56,8 @@ namespace Tourist.API.Controllers.v1
                     var roles = await _userManager.GetRolesAsync(identityUser);
                     var jwtToken = await _tokenRepository.CreateJwtToken(identityUser, roles.ToList());
                     var refreshToken = await _tokenRepository.GenerateRefreshToken();
-                    await _tokenRepository.SaveRefreshToken(identityUser, refreshToken);
+
+                    await _userManager.SetAuthenticationTokenAsync(identityUser, "Tourist-App", identityUser.Email, refreshToken);                   
 
                     var response = new LoginResponseDto
                     {
@@ -94,25 +93,22 @@ namespace Tourist.API.Controllers.v1
                 _logger.LogWarning("Refresh token attempt for invalid user: {Email}", request.Email);
                 return Unauthorized("Invalid user");
             }
-
-            var isValid = await _tokenRepository.ValidateRefreshToken(identityUser, request.RefreshToken);
-            if (!isValid)
+            var storedToken = await _userManager.GetAuthenticationTokenAsync(identityUser, "Tourist-App", request.Email);
+            if (storedToken is null || storedToken != request.RefreshToken)
             {
                 _logger.LogWarning("Invalid refresh token for email: {Email}", request.Email);
                 return Unauthorized("Invalid refresh token");
             }
 
             var roles = await _userManager.GetRolesAsync(identityUser);
-            var newJwtToken = await _tokenRepository.CreateJwtToken(identityUser, roles.ToList());
-            var newRefreshToken = await _tokenRepository.GenerateRefreshToken();
-            await _tokenRepository.SaveRefreshToken(identityUser, newRefreshToken);
+            var newJwtToken = await _tokenRepository.CreateJwtToken(identityUser, roles.ToList());           
 
             var response = new LoginResponseDto
             {
                 Email = request.Email,
                 Role = roles.FirstOrDefault(),
                 Token = newJwtToken,
-                RefreshToken = newRefreshToken
+                RefreshToken = storedToken
             };
 
             _logger.LogInformation("Refresh token issued for email: {Email}, Role: {Role}", request.Email, response.Role);
