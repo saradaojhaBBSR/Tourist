@@ -15,28 +15,22 @@ using Tourist.API.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-
-
-//logger
 if (builder.Environment.IsProduction())
-{
-    builder.Logging.AddApplicationInsights(
-        configureTelemetryConfiguration: (config) =>
-            config.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"],
-        configureApplicationInsightsLoggerOptions: (options) =>
-            options.TrackExceptionsAsExceptionTelemetry = true
-    );
-
+{ 
     //key-vault
     var keyVaultUrl = builder.Configuration["KeyVault:VaultUri"];
     if (!string.IsNullOrEmpty(keyVaultUrl))
     {
         builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUrl), new DefaultAzureCredential());
     }
-}
-var touristConnectionString = builder.Configuration.GetConnectionString("TouristConnectionString");
 
+    builder.Logging.AddApplicationInsights(
+       configureTelemetryConfiguration: (config) =>
+           config.ConnectionString = builder.Configuration.GetConnectionString("TouristAppInsightsConnectingString"),
+       configureApplicationInsightsLoggerOptions: (options) =>
+           options.TrackExceptionsAsExceptionTelemetry = true
+   );
+}
 
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseSqlServer(
@@ -49,7 +43,6 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
     ));
 
 
-// Add global logging filter
 builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -121,10 +114,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
-});
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("Admin", policy => policy.RequireRole("Admin"));
 
 var app = builder.Build();
 
