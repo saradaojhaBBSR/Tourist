@@ -18,17 +18,20 @@ namespace Tourist.API.Controllers.v1
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly ILogger<DashboardController> _logger;
 
-        public DashboardController(ApplicationDbContext context, IMapper mapper)
+        public DashboardController(ApplicationDbContext context, IMapper mapper, ILogger<DashboardController> logger)
         {
             _context = context;
             _mapper = mapper;
+            _logger = logger;
         }
 
-        // GET: api/Dashboard/alltouristplaces
+        // GET: api/Dashboard/getalltouristplaces
         [HttpGet("getalltouristplaces")]
         public async Task<ActionResult<IEnumerable<TouristPlacesDto>>> GetTouristPlaces()
         {
+            _logger.LogInformation("Fetching all tourist places.");
             var places = await _context.TouristPlaces.ToListAsync();
             var placesDto = _mapper.Map<List<TouristPlacesDto>>(places);
             return Ok(placesDto);
@@ -38,9 +41,11 @@ namespace Tourist.API.Controllers.v1
         [HttpGet("gettouristplacebyid/{id}")]
         public async Task<ActionResult<TouristPlacesDto>> GetTouristPlace(int id)
         {
+            _logger.LogInformation("Fetching tourist place with ID {TouristPlaceId}.", id);
             var place = await _context.TouristPlaces.FindAsync(id);
             if (place == null)
             {
+                _logger.LogWarning("Tourist place with ID {TouristPlaceId} not found.", id);
                 return NotFound();
             }
             var placeDto = _mapper.Map<TouristPlacesDto>(place);
@@ -64,6 +69,7 @@ namespace Tourist.API.Controllers.v1
             _context.TouristPlaces.Add(entity);
             await _context.SaveChangesAsync();
             var resultDto = _mapper.Map<TouristPlacesDto>(entity);
+            _logger.LogInformation("Tourist place added by {UserEmail}: {@TouristPlace}", userEmail, entity);
             return CreatedAtAction(nameof(GetTouristPlace), new { id = entity.Id }, resultDto);
         }
 
@@ -74,6 +80,7 @@ namespace Tourist.API.Controllers.v1
             var entity = await _context.TouristPlaces.FindAsync(id);
             if (entity == null)
             {
+                _logger.LogWarning("Attempted to update non-existent tourist place with ID {TouristPlaceId}.", id);
                 return NotFound();
             }
 
@@ -85,6 +92,7 @@ namespace Tourist.API.Controllers.v1
             entity.UpdatedBy = userEmail;
 
             await _context.SaveChangesAsync();
+            _logger.LogInformation("Tourist place with ID {TouristPlaceId} updated by {UserEmail}.", id, userEmail);
 
             return NoContent();
         }
@@ -96,11 +104,13 @@ namespace Tourist.API.Controllers.v1
             var place = await _context.TouristPlaces.FindAsync(id);
             if (place == null)
             {
+                _logger.LogWarning("Attempted to delete non-existent tourist place with ID {TouristPlaceId}.", id);
                 return NotFound();
             }
 
             _context.TouristPlaces.Remove(place);
             await _context.SaveChangesAsync();
+            _logger.LogInformation("Tourist place with ID {TouristPlaceId} deleted.", id);
 
             return NoContent();
         }
