@@ -18,11 +18,11 @@ var builder = WebApplication.CreateBuilder(args);
 if (builder.Environment.IsProduction())
 { 
     //key-vault
-    var keyVaultUrl = builder.Configuration["KeyVault:VaultUri"];
-    if (!string.IsNullOrEmpty(keyVaultUrl))
-    {
-        builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUrl), new DefaultAzureCredential());
-    }
+    //var keyVaultUrl = builder.Configuration["KeyVault:VaultUri"];
+    //if (!string.IsNullOrEmpty(keyVaultUrl))
+    //{
+    //    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUrl), new DefaultAzureCredential());
+    //}
 
     builder.Logging.AddApplicationInsights(
     configureTelemetryConfiguration: (config) =>
