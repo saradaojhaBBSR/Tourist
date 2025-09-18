@@ -118,7 +118,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("Admin", policy => policy.RequireRole("Admin"));
 
+//caching
+builder.Services.AddResponseCaching();
+
 var app = builder.Build();
+
+app.UseResponseCaching();
 
 // Use built-in exception handler
 if (app.Environment.IsDevelopment())

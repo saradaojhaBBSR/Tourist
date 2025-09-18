@@ -11,6 +11,7 @@ namespace Tourist.API.Controllers.v1
     [Route("api/[controller]")]
     [ApiController]
     [ApiVersion("1.0")]
+    [ResponseCache(Duration = 60)]
     public class AuthController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;

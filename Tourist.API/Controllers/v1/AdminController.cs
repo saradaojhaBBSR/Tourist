@@ -12,6 +12,7 @@ namespace Tourist.API.Controllers.v1
     [ApiController]
     [ApiVersion("1.0")]
     [Authorize(Roles = "Admin")]
+    [ResponseCache(Duration = 60)]
     public class AdminController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
