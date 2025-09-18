@@ -32,8 +32,7 @@ export class LoginComponent {
         this.cookieService.set('RefreshToken', res.refreshToken, undefined, '/', undefined, false, 'Lax');
         
         localStorage.setItem('userEmail', this.model.email);
-        if (res.role) {
-          console.log('User role:', res.role);
+        if (res.role) {         
           localStorage.setItem('user-role', res.role);
         } else {
           localStorage.removeItem('user-role');
