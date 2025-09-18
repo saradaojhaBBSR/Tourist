@@ -42,6 +42,16 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
         )
     ));
 
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("TouristConnectionString"),
+        sqlOptions => sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(10),
+            errorNumbersToAdd: null
+        )
+    ));
+
 
 builder.Services.AddControllers();
 
@@ -117,6 +127,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("Contributor", policy => policy.RequireRole("Contributor"));
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("Reader", policy => policy.RequireRole("Reader"));
 
 //caching
 builder.Services.AddResponseCaching();

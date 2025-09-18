@@ -21,6 +21,7 @@ namespace Tourist.API
 
             CreateMap<ApplicationUser, UsersInfoDto>();
             CreateMap<UserUpdateDto, ApplicationUser>();
+            CreateMap<TouristPlaces, TouristPlacesDto>().ReverseMap();
         }
     }
 }   
