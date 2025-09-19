@@ -170,8 +170,11 @@ app.Map("/error", (HttpContext httpContext) =>
 // Apply migrations automatically at startup
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
-    dbContext.Database.Migrate(); // applies any pending migrations
+    var authdbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+    authdbContext.Database.Migrate(); // applies any pending migrations
+
+    var applicationdbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    applicationdbContext.Database.Migrate();
 }
 
 app.UseHttpsRedirection();
