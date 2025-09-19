@@ -1,0 +1,5 @@
+.table-responsive{max-height:60vh;}
+.table tbody tr:hover{background-color:#f8fafc;}
+.input-group .form-control{border-left:0;}
+td.actions .btn{min-width: 72px;}
+td.actions .btn i{vertical-align: -0.125rem;}

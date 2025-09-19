@@ -1,4 +1,6 @@
-import { NgModule } from '@angular/core';
+import { NgModule, LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeEnIn from '@angular/common/locales/en-IN';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { jwtRefreshInterceptorFn } from './core/interceptors/jwt-refresh.interceptor';
 import { BrowserModule } from '@angular/platform-browser';
@@ -38,8 +40,12 @@ import { AdminComponent } from './admin/admin.component';
     ])),
     AuthGuard,
     CookieService,
-    { provide: ErrorHandler, useClass: GlobalErrorHandler }
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
+    { provide: LOCALE_ID, useValue: 'en-IN' }
   ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+
+// Register locale data for Indian numbering system (₹, lakhs/crores)
+registerLocaleData(localeEnIn);

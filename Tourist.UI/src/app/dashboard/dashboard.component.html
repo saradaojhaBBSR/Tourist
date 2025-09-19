@@ -8,6 +8,148 @@
 			<div *ngIf="userEmail; else noUser">
 				<p class="lead">Welcome, <strong>{{ userEmail }}</strong>!</p>
 				<app-admin *ngIf="isAdmin()"></app-admin>
+
+						<!-- Tourist Places Panel -->
+						<div class="container-fluid my-4">
+							<div class="card">
+								<div class="card-header d-flex justify-content-between align-items-center bg-info text-dark" style="cursor:pointer; border-radius: .5rem .5rem 0 0;" (click)="placePanelOpen = !placePanelOpen">
+									<span class="fw-bold">
+										<i class="bi" [ngClass]="placePanelOpen ? 'bi-caret-down-fill' : 'bi-caret-right-fill'"></i>
+										Tourist Places
+									</span>
+									<i class="bi fs-4" [ngClass]="placePanelOpen ? 'bi-dash-lg' : 'bi-plus-lg'"></i>
+								</div>
+								<div [ngClass]="placePanelOpen ? 'collapse show' : 'collapse'" id="placesPanel">
+									<div class="card-body bg-light rounded-bottom">
+										<div *ngIf="errorMsg" class="alert alert-danger py-2">{{ errorMsg }}</div>
+										<div *ngIf="successMsg" class="alert alert-success py-2">{{ successMsg }}</div>
+										<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+											<div class="input-group" style="max-width: 360px;">
+												<span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+												<input type="text" class="form-control" placeholder="Search places..." [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange()">
+											</div>
+											<div class="d-flex align-items-center gap-2">
+												<span *ngIf="isReader()" class="badge text-bg-secondary">Read-only</span>
+												<button class="btn btn-primary" (click)="openAddPlaceForm()" *ngIf="canAddOrUpdate()">
+													<i class="bi bi-plus-lg me-1"></i> Add Place
+												</button>
+											</div>
+										</div>
+										<div class="position-relative">
+											<div *ngIf="loading" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-50" style="z-index:5;">
+												<div class="spinner-border text-primary" role="status">
+												  <span class="visually-hidden">Loading...</span>
+												</div>
+											</div>
+										</div>
+										<div class="table-responsive rounded border bg-white shadow-sm" *ngIf="filteredPlaces().length; else emptyState">
+											<table class="table table-hover table-bordered align-middle mb-0">
+												<thead class="table-light position-sticky top-0" style="z-index:1;">
+												<tr>
+													<th class="text-nowrap">Country</th>
+													<th class="text-nowrap">State</th>
+													<th class="text-nowrap">City</th>
+													<th class="text-nowrap">Place Name</th>
+													<th class="text-nowrap">Description</th>
+													<th class="text-nowrap">Location</th>
+													<th class="text-nowrap">Image</th>
+													<th class="text-nowrap text-end">Entry Fee</th>
+													<th class="text-nowrap">Actions</th>
+												</tr>
+												</thead>
+												<tbody>
+													<tr *ngFor="let place of filteredPlaces(); trackBy: trackByPlace">
+														<td class="text-nowrap">{{ place.country }}</td>
+														<td class="text-nowrap">{{ place.state }}</td>
+														<td class="text-nowrap">{{ place.city }}</td>
+														<td class="text-truncate" style="max-width: 200px;" [title]="place.placeName">{{ place.placeName }}</td>
+														<td class="text-truncate" style="max-width: 280px;" [title]="place.description">{{ place.description }}</td>
+														<td class="text-truncate" style="max-width: 180px;" [title]="place.location">{{ place.location }}</td>
+														<td>
+															<img [src]="place.imageUrl" alt="Image" class="rounded" width="64" height="42" style="object-fit:cover;">
+														</td>
+														<td class="text-end"><span class="badge text-bg-light">{{ place.entryFee | currency:'INR':'symbol-narrow' }}</span></td>
+														<td class="text-nowrap actions">
+															<button class="btn btn-sm btn-primary me-2" (click)="openEditPlaceForm(place)" *ngIf="canEditPlace(place)">
+																<i class="bi bi-pencil-square me-1"></i>
+																Edit
+															</button>
+															<button class="btn btn-sm btn-danger" (click)="deletePlace(place)" *ngIf="canDelete()">
+																<i class="bi bi-trash me-1"></i>
+																Delete
+															</button>
+														</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+										<ng-template #emptyState>
+											<div class="text-center text-muted py-5 border rounded bg-white shadow-sm">
+												<p class="mb-1">No tourist places found.</p>
+												<small *ngIf="searchTerm">Try clearing the search.</small>
+											</div>
+										</ng-template>
+										<div *ngIf="!places.length" class="text-muted">No tourist places added yet.</div>
+
+										<div *ngIf="showPlaceForm" class="card mt-4">
+											<div class="card-body">
+												<h5 class="card-title mb-3">{{ editingPlace ? 'Update' : 'Add' }} Tourist Place</h5>
+												<form (ngSubmit)="savePlace()">
+													<div class="row g-2">
+														<div class="col-md-4 mb-2">
+															<label>Country</label>
+															<select [(ngModel)]="placeForm.country" name="country" class="form-select" required (change)="onCountryChange($event)">
+																<option value="">Select Country</option>
+																<option *ngFor="let c of countries" [attr.data-code]="c.isoCode" [ngValue]="c.name">{{ c.name }}</option>
+															</select>
+														</div>
+														<div class="col-md-4 mb-2">
+															<label>State</label>
+															<select [(ngModel)]="placeForm.state" name="state" class="form-select" required (change)="onStateChange($event)" [disabled]="!states.length">
+																<option value="">Select State</option>
+																<option *ngFor="let s of states" [attr.data-code]="s.isoCode" [ngValue]="s.name">{{ s.name }}</option>
+															</select>
+														</div>
+														<div class="col-md-4 mb-2">
+															<label>City</label>
+															<select [(ngModel)]="placeForm.city" name="city" class="form-select" required [disabled]="!cities.length">
+																<option value="">Select City</option>
+																<option *ngFor="let d of cities" [value]="d.name">{{ d.name }}</option>
+															</select>
+														</div>
+														<div class="col-md-6 mb-2">
+															<label>Place Name</label>
+															<input [(ngModel)]="placeForm.placeName" name="placeName" class="form-control" required />
+														</div>
+														<div class="col-md-6 mb-2">
+															<label>Location</label>
+															<input [(ngModel)]="placeForm.location" name="location" class="form-control" required />
+														</div>
+														<div class="col-12 mb-2">
+															<label>Description</label>
+															<textarea [(ngModel)]="placeForm.description" name="description" class="form-control" rows="2" required></textarea>
+														</div>
+														<div class="col-md-6 mb-2">
+															<label>Image URL</label>
+															<input [(ngModel)]="placeForm.imageUrl" name="imageUrl" class="form-control" required />
+														</div>
+														<div class="col-md-6 mb-2">
+															<label>Entry Fee</label>
+															<input [(ngModel)]="placeForm.entryFee" name="entryFee" type="number" class="form-control" required min="0" />
+														</div>
+													</div>
+													<div class="mt-3">
+														<button class="btn btn-success me-2" type="submit">{{ editingPlace ? 'Update' : 'Add' }}</button>
+														<button class="btn btn-secondary" type="button" (click)="cancelPlaceForm()">Cancel</button>
+													</div>
+												</form>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- End Tourist Places Panel -->
 			</div>
 			<ng-template #noUser>
 				<p class="text-danger">No user logged in.</p>
