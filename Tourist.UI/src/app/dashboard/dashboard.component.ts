@@ -39,8 +39,7 @@ export class DashboardComponent {
           }
         }
         // Force change detection after data update
-        this.cdr.detectChanges();
-        console.log('Fetched places (with callback):', this.places);
+        this.cdr.detectChanges();       
       },
       error: (err) => {
         this.errorMsg = err?.error?.message || 'Failed to load places';
@@ -160,8 +159,7 @@ export class DashboardComponent {
           }
         }
         // Force change detection after data update
-        this.cdr.detectChanges();
-        console.log('Fetched places:', this.places);
+        this.cdr.detectChanges();    
         this.loading = false;
       },
       error: (err) => {
