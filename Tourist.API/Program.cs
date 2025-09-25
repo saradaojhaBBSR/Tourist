@@ -1,11 +1,11 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.Conventions;
-using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.Text;
 using Tourist.API;
 using Tourist.API.Data;
@@ -15,22 +15,35 @@ using Tourist.API.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-if (builder.Environment.IsProduction())
-{ 
-    //key-vault
-    //var keyVaultUrl = builder.Configuration["KeyVault:VaultUri"];
-    //if (!string.IsNullOrEmpty(keyVaultUrl))
-    //{
-    //    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUrl), new DefaultAzureCredential());
-    //}
 
-    builder.Logging.AddApplicationInsights(
-    configureTelemetryConfiguration: (config) =>
-        config.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"],
-    configureApplicationInsightsLoggerOptions: (options) =>
-        options.TrackExceptionsAsExceptionTelemetry = true
- );
-}
+//logging using serilog
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.ApplicationInsights(
+       builder.Configuration["ApplicationInsights:ConnectionString"],
+        TelemetryConverter.Traces)
+    //.WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+//if (builder.Environment.IsProduction())
+//{
+//    //key-vault
+//    //var keyVaultUrl = builder.Configuration["KeyVault:VaultUri"];
+//    //if (!string.IsNullOrEmpty(keyVaultUrl))
+//    //{
+//    //    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUrl), new DefaultAzureCredential());
+//    //}
+
+//    builder.Logging.AddApplicationInsights(
+//    configureTelemetryConfiguration: (config) =>
+//        config.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"],
+//    configureApplicationInsightsLoggerOptions: (options) =>
+//        options.TrackExceptionsAsExceptionTelemetry = true
+// );
+//}
 
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseSqlServer(
@@ -146,7 +159,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
-    app.UseSwaggerUI();    
+    app.UseSwaggerUI();
 }
 else
 {
@@ -161,7 +174,7 @@ app.Map("/error", (HttpContext httpContext) =>
     var logger = httpContext.RequestServices.GetRequiredService<ILogger<Program>>();
     if (exception != null)
     {
-        logger.LogError(exception, "Unhandled exception caught by built-in middleware: {ExceptionType} - {Message}\nStackTrace: {StackTrace}", 
+        logger.LogError(exception, "Unhandled exception caught by built-in middleware: {ExceptionType} - {Message}\nStackTrace: {StackTrace}",
             exception.GetType().FullName, exception.Message, exception.StackTrace);
     }
     return Results.Problem("An unexpected error occurred.");
