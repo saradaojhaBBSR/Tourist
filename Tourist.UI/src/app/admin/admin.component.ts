@@ -51,12 +51,22 @@ export class AdminComponent {
     this.loading = true;
     this.success = '';
     this.error = '';
-    this.adminService.patchUser(this.editUserId, this.editUserData).subscribe({
-      next: () => {
+    const id = this.editUserId;
+    this.adminService.patchUser(id, this.editUserData).subscribe({
+      next: (resp) => {
+        // Optimistic UI update: merge edited data (and server response when available)
+        const idx = this.users.findIndex(u => u.id === id);
+        const base = idx >= 0 ? this.users[idx] : {};
+        const merged = (resp && typeof resp === 'object')
+          ? { ...base, ...this.editUserData, ...resp }
+          : { ...base, ...this.editUserData };
+        if (!merged.id) merged.id = id;
+        this.users = this.users.map(u => u.id === id ? merged : u);
+
         this.editUserId = null;
         this.editUserData = {};
         this.success = 'User updated successfully.';
-        this.fetchUsers();
+        this.loading = false;
         setTimeout(() => { this.success = ''; }, 3000);
       },
       error: () => {
@@ -69,8 +79,16 @@ export class AdminComponent {
   deleteUser(id: string) {
     if (!confirm('Are you sure you want to delete this user?')) return;
     this.loading = true;
+    this.success = '';
+    this.error = '';
     this.adminService.deleteUser(id).subscribe({
-      next: () => this.fetchUsers(),
+      next: () => {
+        // Optimistic UI update: remove the user locally
+        this.users = this.users.filter(u => u.id !== id);
+        this.success = 'User deleted successfully.';
+        this.loading = false;
+        setTimeout(() => { this.success = ''; }, 3000);
+      },
       error: () => {
         this.error = 'Failed to delete user.';
         this.loading = false;
