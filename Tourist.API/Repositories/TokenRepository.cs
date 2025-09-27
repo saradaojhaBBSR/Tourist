@@ -35,12 +35,12 @@ namespace Tourist.API.Repositories
             return await Task.FromResult(jwttoken);
         }
 
-        public Task<string> GenerateRefreshToken()
+        public async Task<string> GenerateRefreshToken()
         {
             var randomBytes = new byte[64];
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomBytes);
-            return Task.FromResult(Convert.ToBase64String(randomBytes));
+            return await Task.FromResult(Convert.ToBase64String(randomBytes));
         }
     }
 }
